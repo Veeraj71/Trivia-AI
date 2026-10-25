@@ -63,7 +63,7 @@ const playerOnly = async (req, res, next) => {
 };
 
 const companyOnly = async (req, res, next) => {
-    if (req.user.role !== 'COMPANY') {
+    if (!['COMPANY', 'HOST'].includes(req.user.role)) {
         return res.status(403).json({ success: false, message: 'Company access required' });
     }
 
@@ -77,7 +77,46 @@ const companyOnly = async (req, res, next) => {
     }
 
     req.company = rows[0];
+    req.host = rows[0];
     next();
 };
 
-module.exports = { protect, adminOnly, playerOnly, companyOnly };
+const hostOnly = async (req, res, next) => {
+    if (!['COMPANY', 'HOST'].includes(req.user.role)) {
+        return res.status(403).json({ success: false, message: 'Host access required' });
+    }
+
+    const [rows] = await db.execute(
+        'SELECT * FROM companies WHERE user_id = ?',
+        [req.user.id]
+    );
+
+    if (rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Host profile not found' });
+    }
+
+    req.company = rows[0];
+    req.host = rows[0];
+    next();
+};
+
+const hostOrCompanyOnly = async (req, res, next) => {
+    if (!['COMPANY', 'HOST'].includes(req.user.role)) {
+        return res.status(403).json({ success: false, message: 'Host or company access required' });
+    }
+
+    const [rows] = await db.execute(
+        'SELECT * FROM companies WHERE user_id = ?',
+        [req.user.id]
+    );
+
+    if (rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Host profile not found' });
+    }
+
+    req.company = rows[0];
+    req.host = rows[0];
+    next();
+};
+
+module.exports = { protect, adminOnly, playerOnly, companyOnly, hostOnly, hostOrCompanyOnly };

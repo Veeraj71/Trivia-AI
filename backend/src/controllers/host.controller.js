@@ -24,7 +24,8 @@ exports.getPendingApprovals = async (req, res) => {
 exports.getAllHosts = async (req, res) => {
     try {
         const { status, page = 1, limit = 20 } = req.query;
-        const offset = (page - 1) * limit;
+        const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+        const safeOffset = Math.max(0, ((parseInt(page, 10) || 1) - 1) * safeLimit);
 
         let query = `SELECT h.id, h.user_id, h.company_name, h.company_email, h.status,
                            h.ai_requests_used, h.ai_requests_limit, h.total_contests,
@@ -39,8 +40,7 @@ exports.getAllHosts = async (req, res) => {
             params.push(status);
         }
 
-        query += ' ORDER BY h.created_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
+        query += ` ORDER BY h.created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
         const [hosts] = await db.execute(query, params);
         res.json({ success: true, hosts });

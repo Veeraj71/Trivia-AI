@@ -117,7 +117,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link to={user ? roleHome : "/"} className="flex items-center gap-2">
                     <Code2 className="text-primary" size={22} />
-                    <span className="font-mono font-bold text-lg text-gradient">CodeCraft</span>
+                    <span className="font-mono font-bold text-lg text-gradient">TriviaAI</span>
                 </Link>
 
                 {/* Right side */}
@@ -153,8 +153,8 @@ export default function Navbar() {
                                         { to: "/host", label: "Dashboard" },
                                         { to: "/host/problems", label: "Problems" },
                                         { to: "/host/contests", label: "Contests" },
-                                        { to: "/host/contests/create", label: "Create Contest" },
-                                        { to: "/host/problems/create", label: "Create Problem" },
+                                        { to: "/host/create-contest", label: "Create Contest" },
+                                        { to: "/host/create-problem", label: "Create Problem" },
                                     ].map((l) => (
                                         <Link
                                             key={l.to}

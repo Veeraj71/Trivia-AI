@@ -4,6 +4,7 @@ export const contestService = {
     // Public / Player
     getContests: (params) => axiosInstance.get("/contests", { params }),
     getContest: (id) => axiosInstance.get(`/contests/${id}`),
+    joinContest: (id, data = {}) => axiosInstance.post(`/contests/${id}/join`, data),
     joinByInvite: (inviteCode) => axiosInstance.post(`/contests/join`, { inviteCode }),
 
     // Admin
@@ -21,5 +22,5 @@ export const contestService = {
     hostGetOne: (id) => axiosInstance.get(`/host/contests/${id}`),
 
     // Leaderboard
-    getLeaderboard: (contestId) => axiosInstance.get(`/leaderboard/${contestId}`),
+    getLeaderboard: (contestId) => axiosInstance.get(`/leaderboard/contest/${contestId}`),
 };

@@ -4,6 +4,35 @@ let socket = null;
 let connectionStatus = 'disconnected'; // 'disconnected', 'connecting', 'connected'
 const eventHandlers = new Map();
 
+const normalizeSocketBaseUrl = (value) => {
+    if (!value) return '';
+
+    let normalized = value.trim().replace(/\/$/, '');
+    normalized = normalized.replace(/\/ws$/i, '');
+    normalized = normalized.replace(/\/socket\.io$/i, '');
+    normalized = normalized.replace(/\/api$/i, '');
+    normalized = normalized.replace(/\/api\/$/i, '');
+    return normalized;
+};
+
+const getSocketBaseUrl = () => {
+    const explicitWsUrl = import.meta.env.VITE_WS_URL;
+    if (explicitWsUrl && explicitWsUrl.trim()) {
+        return normalizeSocketBaseUrl(explicitWsUrl);
+    }
+
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    if (apiBaseUrl && apiBaseUrl.includes('/api')) {
+        return normalizeSocketBaseUrl(apiBaseUrl);
+    }
+
+    if (typeof window !== 'undefined' && window.location?.origin) {
+        return window.location.origin;
+    }
+
+    return 'http://localhost:5000';
+};
+
 export const socketService = {
     /**
      * Connect to Socket.IO server
@@ -12,6 +41,11 @@ export const socketService = {
      * @param {function} onError - Callback on error
      */
     connect(token, onConnected, onError) {
+        if (!token) {
+            if (onError) onError(new Error('No authentication token'));
+            return null;
+        }
+
         if (socket?.connected) {
             if (onConnected) onConnected();
             return socket;
@@ -19,8 +53,12 @@ export const socketService = {
 
         connectionStatus = 'connecting';
 
-        // Extract base URL from VITE_API_BASE_URL (remove /api suffix)
-        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
+        const baseUrl = getSocketBaseUrl();
+        if (!baseUrl || !/^https?:\/\//.test(baseUrl)) {
+            connectionStatus = 'disconnected';
+            if (onError) onError(new Error('Socket URL is not configured'));
+            return null;
+        }
 
         socket = io(baseUrl, {
             auth: { token },

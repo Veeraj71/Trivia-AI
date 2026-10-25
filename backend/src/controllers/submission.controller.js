@@ -164,7 +164,8 @@ async function handleAcceptedSubmission(playerId, problem, contestId, wrongAttem
 exports.getMySubmissions = async (req, res) => {
     try {
         const { contest_id, problem_id, page = 1, limit = 20 } = req.query;
-        const offset = (page - 1) * limit;
+        const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+        const safeOffset = Math.max(0, ((parseInt(page, 10) || 1) - 1) * safeLimit);
         const playerId = req.player.id;
 
         let query = 'SELECT * FROM submission WHERE player_id = ?';
@@ -180,8 +181,7 @@ exports.getMySubmissions = async (req, res) => {
             params.push(problem_id);
         }
 
-        query += ' ORDER BY submitted_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
+        query += ` ORDER BY submitted_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
         const [submissions] = await db.execute(query, params);
 

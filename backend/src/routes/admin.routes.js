@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin.controller');
 const companyController = require('../controllers/company.controller');
+const contestController = require('../controllers/contest.controller');
 const problemController = require('../controllers/problem.controller');
 const { protect, adminOnly } = require('../middleware/auth.middleware');
 
@@ -29,6 +30,14 @@ router.put('/companies/:companyId/suspend', companyController.suspendCompany);
 router.get('/hosts', companyController.getAllCompanies);
 router.patch('/hosts/:companyId/approve', companyController.approveCompany);
 router.patch('/hosts/:companyId/reject', companyController.rejectCompany);
+
+// Admin contest management
+router.get('/contests', contestController.getAllContests);
+router.get('/contests/:id', contestController.getContest);
+router.post('/contests', contestController.createContest);
+router.put('/contests/:id', contestController.updateContest);
+router.patch('/contests/:id/freeze', contestController.freezeContest);
+router.post('/contests/:id/end', contestController.endContest);
 
 // Admin problem management (alias to /api/problems)
 router.get('/problems', problemController.getAllProblems);

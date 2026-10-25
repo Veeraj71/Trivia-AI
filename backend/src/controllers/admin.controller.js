@@ -3,7 +3,8 @@ const db = require('../config/db');
 exports.getAllUsers = async (req, res) => {
     try {
         const { role, status, page = 1, limit = 20 } = req.query;
-        const offset = (page - 1) * limit;
+        const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+        const safeOffset = Math.max(0, ((parseInt(page, 10) || 1) - 1) * safeLimit);
 
         let query = 'SELECT id, name, email, role, status, created_at, last_login FROM users WHERE 1=1';
         const params = [];
@@ -18,8 +19,7 @@ exports.getAllUsers = async (req, res) => {
             params.push(status);
         }
 
-        query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
+        query += ` ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
         const [users] = await db.execute(query, params);
 

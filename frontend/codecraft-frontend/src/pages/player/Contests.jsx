@@ -243,11 +243,20 @@ export default function Contests() {
     setRegisterOpen(true);
   };
 
-  const handleModeSelect = (mode) => {
+  const handleModeSelect = async (mode) => {
     if (!registerContest) return;
-    navigate(`/contests/${registerContest.id}?mode=${mode}`);
-    setRegisterOpen(false);
-    setRegisterContest(null);
+
+    try {
+      const normalizedMode = mode === "solo" ? "GRINDER" : "LEGEND";
+      await contestService.joinContest(registerContest.id, { mode: normalizedMode });
+      navigate(`/contests/${registerContest.id}?mode=${mode}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message ?? "Unable to join contest");
+      return;
+    } finally {
+      setRegisterOpen(false);
+      setRegisterContest(null);
+    }
   };
 
   const handleJoinLive = (contest) => {

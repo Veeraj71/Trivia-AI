@@ -54,7 +54,7 @@ export default function ManageContests() {
         <div className="space-y-5">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-mono font-bold text-slate-100">Manage Contests</h1>
-                <Link to="/admin/contests/create" className="btn-primary flex items-center gap-1.5 text-sm px-4 py-2">
+                <Link to="/admin/create-contest" className="btn-primary flex items-center gap-1.5 text-sm px-4 py-2">
                     <PlusCircle size={15} /> New Contest
                 </Link>
             </div>

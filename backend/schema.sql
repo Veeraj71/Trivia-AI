@@ -285,7 +285,7 @@ CREATE TABLE `announcement` (
 -- =============================================================================
 
 INSERT INTO `users` (`name`, `email`, `password`, `role`, `is_verified`, `status`) VALUES
-('Platform Admin', 'admin@platform.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4oZ4Ry2mey', 'ADMIN', TRUE, 'ACTIVE');
+('Platform Admin', 'admin@platform.com', '$2b$12$dPQalerF87w8tniRXROvXOtrj7.3SY1nzb4TLSUVsnuh0QrGNHKqi', 'ADMIN', TRUE, 'ACTIVE');
 
 -- =============================================================================
 -- SEED: Sample Problems for Testing

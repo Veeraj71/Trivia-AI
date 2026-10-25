@@ -196,7 +196,13 @@ export default function ContestRoom() {
             // 4. Optional: Get leaderboard
             try {
                 const lRes = await contestService.getLeaderboard(id);
-                setLeaderboard(lRes.data ?? []);
+                const payload = lRes.data ?? {};
+                const nextLeaderboard = Array.isArray(payload)
+                    ? payload
+                    : Array.isArray(payload.leaderboard)
+                        ? payload.leaderboard
+                        : [];
+                setLeaderboard(nextLeaderboard);
             } catch (err) {
                 console.warn("Failed to load leaderboard for contest:", err);
                 setLeaderboard([]);

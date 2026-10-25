@@ -50,14 +50,14 @@ export default function HostDashboard() {
             {/* Quick actions */}
             <div className="grid grid-cols-2 gap-3">
                 <Link
-                    to="/host/problems/create"
+                    to="/host/create-problem"
                     className={`card flex items-center gap-3 hover:border-primary/40 transition-colors ${!isApproved ? "opacity-50 pointer-events-none" : ""}`}
                 >
                     <PlusCircle className="text-primary" size={20} />
                     <span className="font-medium text-slate-200">New Problem</span>
                 </Link>
                 <Link
-                    to="/host/contests/create"
+                    to="/host/create-contest"
                     className={`card flex items-center gap-3 hover:border-secondary/40 transition-colors ${!isApproved ? "opacity-50 pointer-events-none" : ""}`}
                 >
                     <Trophy className="text-secondary" size={20} />

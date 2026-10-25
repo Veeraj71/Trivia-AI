@@ -64,7 +64,7 @@ const ManageProblems = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Problems Bank</h1>
           <a
-            href="/admin/problems/create"
+            href="/admin/create-problem"
             className="flex items-center gap-2 bg-[#F7E800] text-gray-900 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-400 transition no-underline"
           >
             <Plus size={20} />

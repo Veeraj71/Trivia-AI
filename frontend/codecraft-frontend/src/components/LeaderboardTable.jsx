@@ -8,6 +8,15 @@ function formatPenalty(mins) {
 
 export default function LeaderboardTable({ entries = [], frozen = false }) {
     const { user } = useAuth();
+    const normalizedEntries = Array.isArray(entries)
+        ? entries
+        : Array.isArray(entries?.leaderboard)
+            ? entries.leaderboard
+            : Array.isArray(entries?.data)
+                ? entries.data
+                : Array.isArray(entries?.data?.leaderboard)
+                    ? entries.data.leaderboard
+                    : [];
 
     return (
         <div className="card overflow-hidden p-0">
@@ -30,19 +39,25 @@ export default function LeaderboardTable({ entries = [], frozen = false }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {entries.length === 0 && (
+                        {normalizedEntries.length === 0 && (
                             <tr>
                                 <td colSpan={6} className="table-cell text-center text-slate-500 py-8">
                                     No participants yet
                                 </td>
                             </tr>
                         )}
-                        {entries.map((entry, idx) => {
-                            const isCurrentUser = user && entry.userId === user.id;
-                            const rank = entry.final_rank ?? idx + 1;
+                        {normalizedEntries.map((entry, idx) => {
+                            const entryUserId = entry.userId ?? entry.user_id ?? entry.player_id ?? entry.id;
+                            const isCurrentUser = user && entryUserId === user.id;
+                            const username = entry.username ?? entry.name ?? `Player #${entryUserId ?? idx + 1}`;
+                            const rawScore = entry.raw_score ?? entry.score ?? "—";
+                            const accuracyScore = entry.accuracy_score ?? entry.accuracy ?? null;
+                            const penalties = entry.penalty_mins ?? entry.penalty ?? 0;
+                            const solved = entry.problems_solved ?? entry.solved ?? 0;
+                            const rank = entry.final_rank ?? entry.rank ?? idx + 1;
                             return (
                                 <tr
-                                    key={entry.userId ?? idx}
+                                    key={`${entryUserId ?? "player"}-${idx}`}
                                     className={`table-row ${isCurrentUser ? "bg-primary/10 border-l-2 border-primary" : ""}`}
                                 >
                                     <td className="table-cell w-12">
@@ -50,23 +65,23 @@ export default function LeaderboardTable({ entries = [], frozen = false }) {
                                     </td>
                                     <td className="table-cell">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-medium text-slate-200">{entry.username}</span>
+                                            <span className="font-medium text-slate-200">{username}</span>
                                             {isCurrentUser && (
                                                 <span className="text-xs text-primary">(you)</span>
                                             )}
                                         </div>
                                     </td>
                                     <td className="table-cell text-right font-mono font-semibold text-slate-100">
-                                        {entry.raw_score ?? "—"}
+                                        {rawScore}
                                     </td>
                                     <td className="table-cell text-right text-slate-300">
-                                        {entry.problems_solved ?? 0}
+                                        {solved}
                                     </td>
                                     <td className="table-cell text-right text-slate-300">
-                                        {entry.accuracy_score != null ? `${(entry.accuracy_score * 100).toFixed(1)}%` : "—"}
+                                        {accuracyScore != null ? `${(Number(accuracyScore) * 100).toFixed(1)}%` : "—"}
                                     </td>
                                     <td className="table-cell text-right text-slate-400 font-mono">
-                                        {formatPenalty(entry.penalty_mins)}
+                                        {formatPenalty(penalties)}
                                     </td>
                                 </tr>
                             );

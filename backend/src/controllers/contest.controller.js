@@ -2,10 +2,37 @@ const db = require('../config/db');
 const { generateInviteCode } = require('../utils/helpers');
 const { XP } = require('../config/constants');
 
+const normalizeMySqlDateTime = (value) => {
+    if (value === null || value === undefined || value === '') {
+        return value;
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toISOString().slice(0, 19).replace('T', ' ');
+};
+
+const normalizeContestMode = (mode) => {
+    const value = String(mode ?? 'GRINDER').trim().toUpperCase();
+    const modeMap = {
+        SOLO: 'GRINDER',
+        TEAM: 'LEGEND',
+        PRECISION: 'PRECISION',
+        GRINDER: 'GRINDER',
+        LEGEND: 'LEGEND'
+    };
+
+    return modeMap[value] || 'GRINDER';
+};
+
 exports.getAllContests = async (req, res) => {
     try {
         const { status, page = 1, limit = 10 } = req.query;
-        const offset = (page - 1) * limit;
+        const safeLimit = Math.max(1, parseInt(limit, 10) || 10);
+        const safeOffset = Math.max(0, ((parseInt(page, 10) || 1) - 1) * safeLimit);
 
         let query = 'SELECT * FROM contest WHERE 1=1';
         const params = [];
@@ -15,8 +42,7 @@ exports.getAllContests = async (req, res) => {
             params.push(status);
         }
 
-        query += ' ORDER BY start_time DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
+        query += ` ORDER BY start_time DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
         const [contests] = await db.execute(query, params);
 
@@ -110,6 +136,8 @@ exports.createContest = async (req, res) => {
         } = req.body;
 
         const inviteCode = is_public ? null : generateInviteCode();
+        const normalizedStartTime = normalizeMySqlDateTime(start_time);
+        const normalizedEndTime = normalizeMySqlDateTime(end_time);
 
         const [result] = await db.execute(
             `INSERT INTO contest (title, description, problems, start_time, end_time, duration_mins, is_public, invite_code, created_by, status)
@@ -118,8 +146,8 @@ exports.createContest = async (req, res) => {
                 title,
                 description,
                 JSON.stringify(problems),
-                start_time,
-                end_time,
+                normalizedStartTime,
+                normalizedEndTime,
                 duration_mins || 90,
                 is_public !== false,
                 inviteCode,
@@ -150,8 +178,16 @@ exports.updateContest = async (req, res) => {
         Object.keys(updates).forEach(key => {
             if (['title', 'description', 'problems', 'start_time', 'end_time',
                 'duration_mins', 'is_public', 'leaderboard_frozen'].includes(key)) {
+                let value = updates[key];
+
+                if (key === 'start_time' || key === 'end_time') {
+                    value = normalizeMySqlDateTime(value);
+                } else if (typeof value === 'object') {
+                    value = JSON.stringify(value);
+                }
+
                 fields.push(`${key} = ?`);
-                values.push(typeof updates[key] === 'object' ? JSON.stringify(updates[key]) : updates[key]);
+                values.push(value);
             }
         });
 
@@ -198,6 +234,7 @@ exports.joinContest = async (req, res) => {
         const { id } = req.params;
         const { mode = 'GRINDER', invite_code } = req.body;
         const playerId = req.player.id;
+        const normalizedMode = normalizeContestMode(mode);
 
         // Get contest
         const [contests] = await db.execute('SELECT * FROM contest WHERE id = ?', [id]);
@@ -230,7 +267,7 @@ exports.joinContest = async (req, res) => {
         // Join contest
         await db.execute(
             'INSERT INTO contest_participant (contest_id, player_id, mode) VALUES (?, ?, ?)',
-            [id, playerId, mode]
+            [id, playerId, normalizedMode]
         );
 
         // Update participant count
@@ -260,11 +297,49 @@ exports.joinContest = async (req, res) => {
     }
 };
 
+exports.freezeContest = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { leaderboard_frozen } = req.body;
+
+        if (typeof leaderboard_frozen !== 'boolean') {
+            return res.status(400).json({ success: false, message: 'leaderboard_frozen must be a boolean' });
+        }
+
+        await db.execute('UPDATE contest SET leaderboard_frozen = ? WHERE id = ?', [leaderboard_frozen, id]);
+
+        res.json({
+            success: true,
+            message: leaderboard_frozen ? 'Leaderboard frozen' : 'Leaderboard unfrozen',
+            contestId: Number(id)
+        });
+    } catch (error) {
+        console.error('Freeze contest error:', error);
+        res.status(500).json({ success: false, message: 'Failed to update leaderboard state' });
+    }
+};
+
+exports.endContest = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await db.execute('UPDATE contest SET status = ?, leaderboard_frozen = TRUE WHERE id = ?', ['ENDED', id]);
+
+        res.json({ success: true, message: 'Contest ended', contestId: Number(id) });
+    } catch (error) {
+        console.error('End contest error:', error);
+        res.status(500).json({ success: false, message: 'Failed to end contest' });
+    }
+};
+
 exports.getLeaderboard = async (req, res) => {
     try {
         const { id } = req.params;
         const { page = 1, limit = 50 } = req.query;
         const offset = (page - 1) * limit;
+
+        const safeLimit = Math.max(1, parseInt(limit, 10) || 50);
+        const safeOffset = Math.max(0, ((parseInt(page, 10) || 1) - 1) * safeLimit);
 
         const [leaderboard] = await db.execute(
             `SELECT cp.*, u.name, u.profile_picture, p.tier, p.sub_rank
@@ -273,8 +348,8 @@ exports.getLeaderboard = async (req, res) => {
        JOIN users u ON p.user_id = u.id
        WHERE cp.contest_id = ?
        ORDER BY cp.final_rating DESC, cp.last_solved_at ASC
-       LIMIT ? OFFSET ?`,
-            [id, parseInt(limit), parseInt(offset)]
+       LIMIT ${safeLimit} OFFSET ${safeOffset}`,
+            [id]
         );
 
         res.json({ success: true, leaderboard });

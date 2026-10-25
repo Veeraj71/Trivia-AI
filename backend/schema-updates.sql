@@ -4,7 +4,7 @@
 -- =============================================================================
 
 -- Step 1: Update role ENUM in users table
-ALTER TABLE `users` MODIFY COLUMN `role` ENUM('PLAYER', 'ADMIN', 'COMPANY') NOT NULL DEFAULT 'PLAYER';
+ALTER TABLE `users` MODIFY COLUMN `role` ENUM('PLAYER', 'ADMIN', 'COMPANY', 'HOST') NOT NULL DEFAULT 'PLAYER';
 
 -- Step 2: Create companies table (if not exists)
 CREATE TABLE IF NOT EXISTS `companies` (

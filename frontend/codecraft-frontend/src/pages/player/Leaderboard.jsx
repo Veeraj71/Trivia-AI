@@ -20,7 +20,13 @@ export default function Leaderboard() {
             contestService.getLeaderboard(contestId),
         ]).then(([cRes, lRes]) => {
             setContest(cRes.data);
-            setLeaderboard(lRes.data ?? []);
+            const payload = lRes.data ?? {};
+            const nextLeaderboard = Array.isArray(payload)
+                ? payload
+                : Array.isArray(payload.leaderboard)
+                    ? payload.leaderboard
+                    : [];
+            setLeaderboard(nextLeaderboard);
         }).catch(() => toast.error("Failed to load leaderboard"))
             .finally(() => setLoading(false));
     }, [contestId]);
@@ -31,7 +37,13 @@ export default function Leaderboard() {
         socketService.connect(token, () => {
             socketService.subscribe(topic, (data) => {
                 if (!contest?.leaderboard_frozen) {
-                    setLeaderboard(Array.isArray(data) ? data : []);
+                    const payload = data ?? {};
+                    const nextLeaderboard = Array.isArray(payload)
+                        ? payload
+                        : Array.isArray(payload.leaderboard)
+                            ? payload.leaderboard
+                            : [];
+                    setLeaderboard(nextLeaderboard);
                 }
             });
         });

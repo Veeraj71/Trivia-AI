@@ -24,7 +24,8 @@ exports.getPendingApprovals = async (req, res) => {
 exports.getAllCompanies = async (req, res) => {
     try {
         const { status, page = 1, limit = 20 } = req.query;
-        const offset = (page - 1) * limit;
+        const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+        const safeOffset = Math.max(0, ((parseInt(page, 10) || 1) - 1) * safeLimit);
 
         let query = `SELECT c.id, c.user_id, c.company_name, c.company_email, c.status,
                            c.ai_requests_used, c.ai_requests_limit, c.total_contests,
@@ -39,8 +40,7 @@ exports.getAllCompanies = async (req, res) => {
             params.push(status);
         }
 
-        query += ' ORDER BY c.created_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
+        query += ` ORDER BY c.created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
         const [companies] = await db.execute(query, params);
         res.json({ success: true, companies });

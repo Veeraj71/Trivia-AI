@@ -36,6 +36,7 @@ import CreateContest from "../pages/admin/CreateContest";
 // Host pages
 import HostDashboard from "../pages/host/HostDashboard";
 import HostCreateContest from "../pages/host/CreateContest";
+import HostCreateProblem from "../pages/host/CreateProblem";
 import ContestResults from "../pages/host/ContestResults";
 import HostManageProblems from "../pages/host/ManageProblems";
 
@@ -90,6 +91,7 @@ export default function AppRoutes() {
                         <Route path="/host" element={<HostDashboard />} />
                         <Route path="/host/dashboard" element={<HostDashboard />} />
                         <Route path="/host/problems" element={<HostManageProblems />} />
+                        <Route path="/host/create-problem" element={<HostCreateProblem />} />
                         <Route path="/host/create-contest" element={<HostCreateContest />} />
                         <Route path="/host/contest/:contestId/results" element={<ContestResults />} />
                     </Route>

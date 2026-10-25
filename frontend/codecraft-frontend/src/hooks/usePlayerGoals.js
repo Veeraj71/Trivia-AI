@@ -5,7 +5,7 @@ import { playerGoalService, generateCompleteGoals } from "../services/playerGoal
 const FALLBACK_PLAYER_DATA = {
   id: "user-demo",
   name: "Demo Player",
-  email: "demo@codecraft.com",
+  email: "demo@triviaai.com",
   level: 5,
   tier: "Bronze",
   subRank: "Bronze II",
