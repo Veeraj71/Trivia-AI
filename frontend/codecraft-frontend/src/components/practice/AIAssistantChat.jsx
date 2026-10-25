@@ -3,7 +3,7 @@ import { Send, Loader, Sparkles, ChevronDown } from 'lucide-react';
 import geminiService from '../../services/geminiService';
 
 /**
- * CommitArena AI Mentor Sidebar
+ * TriviaAI AI Mentor Sidebar
  * Professional right sidebar for real-time AI assistance
  * Integrated design with the platform theme
  */
@@ -12,7 +12,7 @@ export default function AIAssistantChat() {
     {
       id: 1,
       type: 'bot',
-      text: 'Hey there! 👋 I\'m CommitArena Mentor, your personal AI coding guide. Ask me anything about problems, concepts, or coding tips!',
+      text: 'Hey there! 👋 I\'m TriviaAI Mentor, your personal AI coding guide. Ask me anything about problems, concepts, or coding tips!',
       timestamp: new Date(),
     },
   ]);
@@ -93,7 +93,7 @@ export default function AIAssistantChat() {
             <Sparkles size={16} className="text-white" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-800">CommitArena Mentor</h3>
+            <h3 className="text-sm font-bold text-slate-800">TriviaAI Mentor</h3>
             <p className="text-xs text-blue-600">AI Learning Assistant</p>
           </div>
         </div>

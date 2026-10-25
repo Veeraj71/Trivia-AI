@@ -111,7 +111,7 @@ PracticePage Component
 - Auto-invalidates when expired
 
 ✅ **Beautiful UI**
-- Dark theme (matches CommitArena)
+- Dark theme (matches TriviaAI)
 - Responsive (desktop/mobile)
 - Indigo + cyan color scheme
 - Smooth animations
@@ -465,6 +465,6 @@ Your AI-powered practice recommendation system is LIVE! 🚀
 
 ---
 
-**Let's build amazing things with CommitArena!** 💪
+**Let's build amazing things with TriviaAI!** 💪
 
 *Questions? Check QUICK_START.md for immediate help.*

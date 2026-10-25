@@ -22,19 +22,22 @@ const app = express();
 
 // Middleware
 const allowedOrigins = new Set(
-    (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'http://localhost:3000')
+    (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'http://localhost:3000,http://localhost:5173')
         .split(',')
         .map(origin => origin.trim())
         .filter(Boolean)
 );
 
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true;
+    return allowedOrigins.has(origin)
+        || /^http:\/\/localhost:\d+$/.test(origin)
+        || /^http:\/\/127\.0\.0\.1:\d+$/.test(origin);
+};
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin) {
-            return callback(null, true);
-        }
-
-        if (allowedOrigins.has(origin) || origin.startsWith('http://localhost:')) {
+        if (isAllowedOrigin(origin)) {
             return callback(null, true);
         }
 

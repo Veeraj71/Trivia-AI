@@ -20,9 +20,22 @@ const db = require('../config/db');
 const initWebSocketServer = (app) => {
   const server = http.createServer(app);
   
+  const allowedOrigins = new Set(
+    (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'http://localhost:3000,http://localhost:5173')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  );
+
   const io = socketIO(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.has(origin) || /^http:\/\/localhost:\d+$/.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)) {
+          return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+      },
       credentials: true
     },
     transports: ['websocket', 'polling'],

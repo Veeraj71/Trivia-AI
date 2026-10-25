@@ -164,7 +164,7 @@ import { WelcomeRecommendModal } from '@/components';
 ## 🎨 Visual Design
 
 ```
-✅ Dark theme (matches CommitArena)
+✅ Dark theme (matches TriviaAI)
    ├─ Background: #0F172A
    ├─ Cards: #1E293B
    └─ Borders: #334155
@@ -519,4 +519,4 @@ Before going live:
 **Problems?** Review ARCHITECTURE_DIAGRAM.md for system overview.  
 **Ready to integrate?** Follow AI_RECOMMENDATIONS_CHECKLIST.md.
 
-**Let's go build amazing things with CommitArena!** 💻
+**Let's go build amazing things with TriviaAI!** 💻

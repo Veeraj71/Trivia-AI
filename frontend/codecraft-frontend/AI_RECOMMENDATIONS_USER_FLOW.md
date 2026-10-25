@@ -10,7 +10,7 @@
 ### Step 2: Welcome Modal Appears (First Time Only) 🎯
 - **Automatically shows** when you successfully login for the first time
 - Modal displays:
-  - 🤖 "CommitArena Coach" branding
+  - 🤖 "TriviaAI Coach" branding
   - Welcome message with your player name
   - Info about AI-powered personalized roadmap
   - Two buttons: "View Roadmap" or "Later"
@@ -43,7 +43,7 @@ Navigate to `/practice` via:
   - Estimated time to solve
   - Skills you'll build
 
-**Right Sidebar - CommitArena Mentor (AI Chatbot):**
+**Right Sidebar - TriviaAI Mentor (AI Chatbot):**
 - Professional chat interface
 - Ask AI for:
   - Problem hints
@@ -78,7 +78,7 @@ Navigate to `/practice` via:
 ### Test 3: AI Chatbot ✅
 ```
 1. On Practice page
-2. Look at right sidebar - "CommitArena Mentor"
+2. Look at right sidebar - "TriviaAI Mentor"
 3. Click in the text area
 4. Type: "How do I solve the Two Sum problem?"
 5. Click send or press Enter

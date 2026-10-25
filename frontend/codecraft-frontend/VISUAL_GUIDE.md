@@ -215,7 +215,7 @@ showLabel={true}:  Shows dot + icon + text
 ### Navbar - Avatar Dropdown
 ```
 ┌────────────────────────────────────────────────┐
-│  CommitArena                           [Avatar]▼ │
+│  TriviaAI                           [Avatar]▼ │
 └────────────────────────────────────────────────┘
                                            ↓
                               ┌──────────────────┐
